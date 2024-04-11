@@ -14,7 +14,7 @@ clear all
 set more off
 
 *ssc install fre                                                                // I use this instead of tab as i can understand the value labels and also see missings, without using , m option
-*ssc install estout																// In order to export as latex tables
+*ssc install estout								// In order to export as latex tables
 *----------------------         Setting globals             -------------------*
 
 global path    "/Users/phyllisajoseph/Downloads/GPRL_StataAssessment_2024"
@@ -29,7 +29,7 @@ global kessler "tired nervous sonervous hopeless restless sorestless depressed e
 
 /*-----------------------------------------------------------------------------*
 
-						        	PART 1
+				PART 1
 
 
 
@@ -38,7 +38,7 @@ global kessler "tired nervous sonervous hopeless restless sorestless depressed e
 *~> Demographics
 use "$inputs/demographics.dta", clear       
  
-sort       hhid								      								// by looking at the data i think wave, hhid and hhmid will uniquely identify each observations, next step is to check this
+sort       hhid								      					// by looking at the data i think wave, hhid and hhmid will uniquely identify each observations, next step is to check this
 duplicates re wave hhid hhmid  
 assert     r(N)== r(unique_value)                 								// checking if these three columns would together uniquely identify observations: ans-it does!!
 
@@ -51,7 +51,7 @@ sort 	   hhid
 duplicates re wave hhid Asset_Type InstanceNumber
 assert     r(N)== r(unique_value)                 								// checking if these four columns would together uniquely identify observations: ans-it does!!
 
-* For assets, wave, hhid and Asset_Type are unique identifiers
+* For assets, wave, hhid, Asset_Type and InstanceNumber are unique identifiers
 
 *~> Depression
 use "$inputs/depression.dta", clear   
@@ -66,10 +66,10 @@ assert     r(N)== r(unique_value)                								// checking if these th
 
 use "$inputs/demographics.dta", clear   
 
-by         hhid : egen hhsize = max(hhmid)        if wave==1        			// I do this with the assumption that hhmid goes in order for wave 1, that is if max is 5 then 1 to 3 and 4 are also present in wave 1
-by         hhid : egen hhsize_check= count(hhmid) if wave==1        			// I also do this to check if this assumptioin is right, or is it for instance 5 but actually only three households are survey and the hhmid is simply written as 5 
+by         hhid : egen hhsize = max(hhmid)        if wave==1        		// I do this with the assumption that hhmid goes in order for wave 1, that is if max is 5 then 1 to 3 and 4 are also present in wave 1
+by         hhid : egen hhsize_check= count(hhmid) if wave==1        		// I also do this to check if this assumptioin is right, or is it for instance 5 but actually only three households are survey and the hhmid is simply written as 5 
 
-assert     hhsize == hhsize_check							                    // I see that indeed wave 1, the coding for hhmid goes in order is max of hhid = the count of number if oservations within each hh in wave 1
+assert     hhsize == hhsize_check						// I see that indeed wave 1, the coding for hhmid goes in order is max of hhid = the count of number if oservations within each hh in wave 1
 bys        hhid (wave) : replace hhsize=hhsize[1]                               // I applhy this hhsize based on wave 1 to wave 2 obs as well, as assuming its the same.
 drop       hhsize_check                                                         // dropping this as we only need hhsize
 label      variable hhsize "Household size based on wave 1"
@@ -97,8 +97,8 @@ replace    toolcode = . if inlist(toolcode, -1, -2)
 *~> Imputed currentvalue
 gen        imp_currentvalue = currentvalue
 
-foreach    asset in $assets{          											// Loop to replace missing current value for median currentalue 
-		   levelsof `asset', local(type)                                 		// https://www.stata.com/manuals13/plevelsof.pdf
+foreach    asset in $assets{          						// Loop to replace missing current value for median currentalue 
+		   levelsof `asset', local(type)                                // https://www.stata.com/manuals13/plevelsof.pdf
 		   foreach  i in `type' {
 				    qui sum  currentvalue  if   `asset' ==`i', detail    		// getting the median current value for each type of item within each type of asset eg, median currentvalue of chicken in the asset animaltype
 				    local    median_`i'=   r(p50)                        		// storing the median current value
@@ -119,11 +119,11 @@ assert     totalvalue !=.
 *---------------------  Q5:household-wave level data set   --------------------*
 
 
-*fre Asset_Type 															    // I can use the variable Asset_Type to do this // no missings good, types= Animals, tools and durables, so will use this to create the total value vairables for each type
+*fre Asset_Type 								// I can use the variable Asset_Type to do this // no missings good, types= Animals, tools and durables, so will use this to create the total value vairables for each type
 
 *~> Creating data set with 2 obs per hh                                                             
 bys        hhid wave Asset_Type : egen totalv_   =  total(totalvalue)           // foreach assettyp hh and wave getting the totalvalue
-assert     totalv_ != .                       								    // should not be missing
+assert     totalv_ != .                       					 // should not be missing
 
 keep       hhid wave Asset_Type totalv_                                         // keeping only those variables needed
 
@@ -131,7 +131,7 @@ duplicates drop hhid wave Asset_Type, force                                     
 
 reshape    wide totalv_ , i(hhid wave) j(Asset_Type)                            // reshaping to get colums totalv_animals totalv_tools & totalv_durables
 
-rename     totalv_1 totalv_animals											    // giveing better names
+rename     totalv_1 totalv_animals						// giveing better names
 rename     totalv_2 totalv_tools
 rename     totalv_3 totalv_durables
 
@@ -188,7 +188,7 @@ Econometrica. 2007 Jan;75(1):83-119.
 merge 1:1  wave hhid hhmid using `demographics', keepusing(treat_hh) assert(2 3) keep(3) nogen
 
 foreach    i in $kessler {
-		   forval j =0/1{														// loop gets the median for each component for the control and treated groups
+		   forval j =0/1{								// loop gets the median for each component for the control and treated groups
 				  sum `i' if treat_hh==`j', detail                              // to get treated group median and control group median
 				  local median_`j' = r(p50)
 				  replace `i'= `median_`j'' if missing(`i') & rowmiss!=0 &rowmiss!=10 & treat_hh==`j'
@@ -205,7 +205,7 @@ egen       kessler_score =rowtotal($kessler)                                    
 replace    kessler_score=. if kessler_score==0
 assert     (kessler_score>=10 & kessler_score<=50) |kessler_score==.            // Score range from 10 to 50, 22 obs it is empty
 
-gen        kessler_categories=.												    // https://www.corc.uk.net/media/1275/kessler10_manual.pdf, i get the ranges of kassler score for each category from this document provided
+gen        kessler_categories=.						        // https://www.corc.uk.net/media/1275/kessler10_manual.pdf, i get the ranges of kassler score for each category from this document provided
 replace    kessler_categories =1 if kessler_score>=10 & kessler_score<=19 & kessler_categories==.        
 replace    kessler_categories =2 if kessler_score>=20 & kessler_score<=24 & kessler_categories==.
 replace    kessler_categories =3 if kessler_score>=25 & kessler_score<=29 & kessler_categories==.
@@ -225,23 +225,23 @@ merge m:1  wave hhid using `assets',  assert(1 2 3) keep(3) nogen               
 
 *keep if    inlist(hhmid, 1,2)                                                  // im keeping these as only they were invited for treatment
 
-gen       women= (gender==5)													// I create dummy variable women useful in the next part
+gen       women= (gender==5)							// I create dummy variable women useful in the next part
 label     define gender 1 "female" 0 "male"
 label     values women gender
 label     variable women "Gender(=1 female)"
 
-gen       not_single=inlist(maritalstatus, 1,2,7)								// I create dummy variable for partner useful in the next part
+gen       not_single=inlist(maritalstatus, 1,2,7)				// I create dummy variable for partner useful in the next part
 label     define single 1"Not single" 0 "Single "
 label     values not_single single
 label     variable not_single "Partner(=1 not single)"
 
 
 
-save "$outputs/demographic_asset_depression", replace							// this is data set that will be used for part 2
+save "$outputs/demographic_asset_depression", replace				// this is data set that will be used for part 2
 
 /*-----------------------------------------------------------------------------*
 
-						        	PART 2
+				PART 2
 
 
 *------------  Q1: Explore the relationship between depression and  -----------*/
@@ -252,7 +252,7 @@ save "$outputs/demographic_asset_depression", replace							// this is data set 
 use "$outputs/demographic_asset_depression", clear
 keep if   wave==1
 
-*~> (1)  Household wealth, proxied by total asset value : kessler_categories & totalv_assets
+*~> (1)  Household wealth, proxied by total asset value: kessler_categories & totalv_assets
 
 
 * Top-codiing total asset value to remove outliers
@@ -261,7 +261,7 @@ local     p99=r(p99)
 replace   totalv_assets=`p99' if totalv_assets > `p99'
 
 * Scatter Plot
-set       scheme s1color														// generating a scatter plot to see relationship between total value of assets and  Kessler score
+set       scheme s1color											// generating a scatter plot to see relationship between total value of assets and  Kessler score
 scatter   kessler_score totalv_assets   || lfit kessler_score totalv_assets, ///
           title("Scatter Plot of Kessler Score & Total Asset Value") ///
           xtitle("Total Asset Value") ytitle("Kessler Score") ///
@@ -281,8 +281,8 @@ local footnote "Column 1,2,3 show linear regression between Kessler Scores and t
   local eststr ""
   foreach var of varlist `hhvars' {
   	
-  	reg kessler_score  `var'													// running regression one by one for each of the var in the local hhvars
-	qui estadd scalar N2=e(N)													// getting total observations
+  	reg kessler_score  `var'											// running regression one by one for each of the var in the local hhvars
+	qui estadd scalar N2=e(N)											// getting total observations
     qui summ kessler_score
     qui estadd scalar mean_out=`r(mean)'										// getting mean of outcome=kessler score
      
@@ -326,7 +326,7 @@ keep if   wave==2
 gen   int_female_treated= women*treat_hh										// interaction of gender and treatment status
 
 
-local treat_reg "treat_hh"														// setting locals for explanatory varriable for col1 and col2 and variables for interaction regression
+local treat_reg "treat_hh"												// setting locals for explanatory varriable for col1 and col2 and variables for interaction regression
 local int_reg "women treat_hh int_female_treated"
 local caption "Effect of Group Therapy on Depression"
 
@@ -338,11 +338,11 @@ local footnote "Column 1 shows the treatment effect on household and Column 2 sh
   foreach var in treat_reg int_reg  {
   	
   	reg kessler_score  ``var'', vce(cluster hhid)								// running regressing for each treat regression col1  and regression with int reg col2
-	qui estadd scalar N2=e(N)													// getting total obs
+	qui estadd scalar N2=e(N)										// getting total obs
     qui summ kessler_score
-    qui estadd scalar mean_out=`r(mean)'										// mean of outcome
+    qui estadd scalar mean_out=`r(mean)'									// mean of outcome
      
-	qui est store E`ester'														// next few lines help in formatting the regression table to latex
+	qui est store E`ester'											// next few lines help in formatting the regression table to latex
 	qui estadd local space = ""
 	
 					local  stats " space mean_out  N2 " 
