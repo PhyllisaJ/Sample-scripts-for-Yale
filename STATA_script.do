@@ -1,9 +1,9 @@
 /*******************************************************************************
 
-  STATA TEST         
+        
 
  Author of the script: Phyllisa Joseph
-
+ Date 		     : 8-04-2024
   
   
   note: I comment beside each line of code and I include white
