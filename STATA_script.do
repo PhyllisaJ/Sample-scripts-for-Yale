@@ -1,6 +1,6 @@
 /*******************************************************************************
 
-  STATA TEST         : GPRL, Northwestern
+  STATA TEST         
 
  Author of the script: Phyllisa Joseph
 
