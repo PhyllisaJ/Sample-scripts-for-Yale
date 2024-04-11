@@ -4,7 +4,7 @@
 
 Objective is to identify what characterizes clean-economy jobs
 
-3 files:
+Uses 3 datasets:
 - Linkedin_job_postings.csv: this is the main dataset, it contains information on job postings including job title, location, company, etc.
 - Job_Summary.csv: a dataset with job descriptions
 - Job_skills.csv: a dataset with skills required for the job
@@ -28,7 +28,7 @@ Impact of group therapy sessions on depression:
 Part 1 involves cleaning 3 datasets and creating a single dataset with the necessary information for analysis
 
 Part 2 
--Exploratory analysis using wave 1, relationship between depression and household wealth, proxied by total asset value, relationship between depression and gender and relationship between depression and having a partner.
+- Exploratory analysis using wave 1, relationship between depression and household wealth, proxied by total asset value, relationship between depression and gender and relationship between depression and having a partner.
 - Evaluating the RCT using wave 2, the impact of group therapy sessions on depression, evaluating heterogeneous treatment effect based on gender, and creating publishable tables.
       
 
