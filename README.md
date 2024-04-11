@@ -1,6 +1,6 @@
 
 -------------------------------- 1. R Sample code --------------------------------------------------
-Data task given by the World Bank:
+
 
 Objective is to identify what characterizes clean-economy jobs
 
