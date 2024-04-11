@@ -275,11 +275,11 @@ ggsave("education.png", Education_plot, width = 6, height = 5, units = "in")
 # 3 ) Do clean jobs require more skills: t-test
 
 
-clean_jobs     <- subset(linkdeln, clean_economy_jobs == 1)$nb_skills           # Subsetting the data into two groups: clean jobs and non-clean jobs
+clean_jobs     <- subset(linkdeln, clean_economy_jobs == 1)$nb_skills          # Subsetting the data into two groups: clean jobs and non-clean jobs
 non_clean_jobs <- subset(linkdeln, clean_economy_jobs == 0)$nb_skills
-t_test_result  <- t.test(clean_jobs, non_clean_jobs)                             # Performing t-test
+t_test_result  <- t.test(clean_jobs, non_clean_jobs)                           # Performing t-test
 
-results_df     <- tibble(                                                           # Create a tibble with the t-test results                                             
+results_df     <- tibble(                                                      # Create a tibble with the t-test results                                             
                   Statistics = c("t-statistic", "degrees of freedom", "p-value", "Mean number of skills (Clean Jobs)", "Mean number of skills (Non-Clean Jobs)"),
                   Value = c(t_test_result$statistic, t_test_result$parameter, t_test_result$p.value, t_test_result$estimate[1], t_test_result$estimate[2])
 )
