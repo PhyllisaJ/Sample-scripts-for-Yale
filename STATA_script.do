@@ -15,7 +15,7 @@ set more off
 *ssc install estout								// In order to export as latex tables
 *----------------------         Setting globals             -------------------*
 
-global path    "/Users/phyllisajoseph/Downloads/GPRL_StataAssessment_2024"
+global path    "/Users/phyllisajoseph/Downloads/project_gprl"
 global inputs  "$path/data"
 
 cap    mkdir   "$path/output"
